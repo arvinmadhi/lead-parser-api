@@ -4,7 +4,7 @@ Data processing service for normalizing and cleaning lead data
 import re
 import logging
 import pandas as pd
-from typing import Dict, List, Tuple, Any, Optional
+from typing import Dict, List, Tuple, Any
 from urllib.parse import urlparse, urlunparse
 import phonenumbers
 from email_validator import validate_email, EmailNotValidError
@@ -204,7 +204,7 @@ class DataProcessor:
             parsed = phonenumbers.parse(numeric_only, None)
             if phonenumbers.is_valid_number(parsed):
                 return phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
-        except:
+        except Exception:
             pass
         
         # Fallback: ensure leading + for international format

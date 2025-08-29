@@ -1,7 +1,6 @@
 """
 Lead Parser API - Main application entry point
 """
-import os
 import logging
 import uuid
 from contextlib import asynccontextmanager
@@ -9,7 +8,6 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from app.config import settings
 from app.api.routes import router
 from app.utils.logging import setup_logging
 
