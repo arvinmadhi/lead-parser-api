@@ -4,7 +4,6 @@ API routes for the Lead Parser
 import logging
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException, Request, Depends
-from fastapi.responses import JSONResponse
 
 from app.models import (
     ParseRequest, ParseResponse, JobResponse, JobStatusResponse
@@ -33,7 +32,7 @@ async def parse_file(
     Synchronous file parsing endpoint for small/medium files
     """
     try:
-        logger.info(f"Parse request received")
+        logger.info("Parse request received")
         
         # Initialize parsing service
         parsing_service = ParsingService()
@@ -130,7 +129,7 @@ async def create_job(
     Create async job for large file processing
     """
     try:
-        logger.info(f"Job creation request received")
+        logger.info("Job creation request received")
         
         # Create job
         job_id = job_manager.create_job(request_data, correlation_id)
@@ -538,10 +537,8 @@ async def test_parse_file(
         # Test the complete workflow without upload
         from app.services.google_drive import GoogleDriveService
         from app.services.gemini import GeminiService  
-        from app.services.data_processor import DataProcessor
-        from app.services.parser import ParsingService
-        import time
         import pandas as pd
+        from app.services.data_processor import DataProcessor
         from io import BytesIO
         
         # Step 1: Download file
@@ -552,10 +549,8 @@ async def test_parse_file(
         file_io = BytesIO(file_content)
         if mime_type == 'text/csv' or file_name.lower().endswith('.csv'):
             df = pd.read_csv(file_io, encoding='utf-8')
-            file_type = 'csv'
         else:
             df = pd.read_excel(file_io, engine='openpyxl')
-            file_type = 'xlsx'
         
         # Step 3: Header mapping with Gemini
         gemini_service = GeminiService()

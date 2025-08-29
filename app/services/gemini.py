@@ -4,7 +4,7 @@ Gemini service for header mapping using Gemini 2.5 Flash
 import json
 import logging
 import asyncio
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 

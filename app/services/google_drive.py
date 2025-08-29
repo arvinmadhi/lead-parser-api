@@ -4,10 +4,9 @@ Google Drive service for file operations
 import os
 import io
 import logging
-from typing import Optional, Tuple, BinaryIO
+from typing import Tuple
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload, MediaIoBaseUpload
-from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 from googleapiclient.errors import HttpError
 
@@ -157,7 +156,7 @@ class GoogleDriveService:
             if e.resp.status == 403:
                 if 'storageQuotaExceeded' in error_content:
                     logger.error(f"Storage quota exceeded for folder {folder_id}")
-                    raise ValueError(f"Storage quota exceeded. This may be a service account storage limit issue.")
+                    raise ValueError("Storage quota exceeded. This may be a service account storage limit issue.")
                 else:
                     logger.error(f"Access denied to folder {folder_id}. Ensure the folder is shared with the service account.")
                     raise ValueError(f"Access denied to folder {folder_id}. Please share the folder with the service account.")
