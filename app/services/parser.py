@@ -6,7 +6,7 @@ import json
 import logging
 import pandas as pd
 import httpx
-from typing import Tuple, Optional
+from typing import Tuple
 from io import BytesIO
 
 from app.models import (

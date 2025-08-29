@@ -7,8 +7,7 @@ import logging
 import uuid
 from datetime import datetime, timedelta
 from typing import Dict, Optional, Any
-from dataclasses import dataclass, asdict
-from enum import Enum
+from dataclasses import dataclass
 
 from app.models import JobStatus, ParseRequest, ParseResponse, JobStatusResponse
 from app.services.parser import ParsingService
