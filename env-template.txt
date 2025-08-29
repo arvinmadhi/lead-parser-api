@@ -1,0 +1,7 @@
+# Copy this to .env file
+GOOGLE_APPLICATION_CREDENTIALS=/Users/arvinmadhi/Code/Refoundry-Flow/Parser/service-account-key.json
+GEMINI_API_KEY=AIzaSyBToyXk5JrZbcRqv9uFo6TI5IAsWulHRPg
+DEBUG=false
+GEMINI_TIMEOUT=60
+MAX_FILE_SIZE_MB=100
+MAX_ROWS_FOR_SYNC=10000
