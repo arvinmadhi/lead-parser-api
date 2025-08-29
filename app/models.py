@@ -1,7 +1,7 @@
 """
 Pydantic models for the Lead Parser API
 """
-from typing import Optional, Dict, List, Any, Union
+from typing import Optional, Dict, List
 from enum import Enum
 from pydantic import BaseModel, Field, model_validator
 

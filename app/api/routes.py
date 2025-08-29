@@ -4,7 +4,6 @@ API routes for the Lead Parser
 import logging
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException, Request, Depends
-from fastapi.responses import JSONResponse
 
 from app.models import (
     ParseRequest, ParseResponse, JobResponse, JobStatusResponse
@@ -33,7 +32,7 @@ async def parse_file(
     Synchronous file parsing endpoint for small/medium files
     """
     try:
-        logger.info(f"Parse request received")
+        logger.info("Parse request received")
         
         # Initialize parsing service
         parsing_service = ParsingService()
@@ -130,7 +129,7 @@ async def create_job(
     Create async job for large file processing
     """
     try:
-        logger.info(f"Job creation request received")
+        logger.info("Job creation request received")
         
         # Create job
         job_id = job_manager.create_job(request_data, correlation_id)
@@ -520,87 +519,3 @@ async def test_parse_to_csv(
         }
 
 
-@router.post("/test/parse/{file_id}")
-async def test_parse_file(
-    file_id: str,
-    request: Request,
-    one_contact_per_company: bool = False,
-    source_label: str = "Test Run",
-    correlation_id: str = Depends(get_correlation_id)
-):
-    """
-    Test endpoint to parse a file from the hardcoded input folder
-    Returns processed data directly without upload to bypass storage quota issues
-    """
-    try:
-        logger.info(f"Test parse request for file {file_id}")
-        
-        # Test the complete workflow without upload
-        from app.services.google_drive import GoogleDriveService
-        from app.services.gemini import GeminiService  
-        from app.services.data_processor import DataProcessor
-        from app.services.parser import ParsingService
-        import time
-        import pandas as pd
-        from io import BytesIO
-        
-        # Step 1: Download file
-        drive_service = GoogleDriveService()
-        file_content, file_name, mime_type = await drive_service.download_file(file_id)
-        
-        # Step 2: Load data
-        file_io = BytesIO(file_content)
-        if mime_type == 'text/csv' or file_name.lower().endswith('.csv'):
-            df = pd.read_csv(file_io, encoding='utf-8')
-            file_type = 'csv'
-        else:
-            df = pd.read_excel(file_io, engine='openpyxl')
-            file_type = 'xlsx'
-        
-        # Step 3: Header mapping with Gemini
-        gemini_service = GeminiService()
-        sample_rows = df.head(25).to_dict('records')
-        header_mapping = await gemini_service.map_headers(df.columns.tolist(), sample_rows)
-        
-        # Step 4: Process data
-        from app.models import ParseOptions
-        options = ParseOptions(
-            one_contact_per_company=one_contact_per_company,
-            source_label=source_label
-        )
-        processor = DataProcessor(options)
-        processed_df, drops, stats = processor.process_dataframe(df, header_mapping.mapping)
-        
-        # Step 5: Generate CSV content
-        csv_content = processed_df.to_csv(index=False)
-        
-        # Return results directly
-        return {
-            "status": "success",
-            "message": "Complete end-to-end parsing successful!",
-            "input_file": file_name,
-            "input_rows": len(df),
-            "output_rows": len(processed_df),
-            "header_mapping": header_mapping.mapping,
-            "unmapped_headers": header_mapping.unmapped,
-            "dropped_rows": len(drops),
-            "stats": {
-                "valid_emails": stats.valid_email_ratio,
-                "linkedin_profiles": stats.linkedin_ratio,
-                "phones": stats.phone_ratio,
-                "companies": stats.company_ratio
-            },
-            "processed_csv_preview": csv_content[:500] + "..." if len(csv_content) > 500 else csv_content,
-            "correlation_id": correlation_id
-        }
-        
-    except Exception as e:
-        logger.error(f"Test parse failed: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "error": "Test parse failed",
-                "message": str(e),
-                "correlation_id": correlation_id
-            }
-        )
